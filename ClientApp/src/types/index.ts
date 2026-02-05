@@ -1,0 +1,1 @@
+export type { CardInfo } from './card';

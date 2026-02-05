@@ -1,10 +1,10 @@
-import type { CardInfo } from "./types/card";
+import type { CardInfo } from './types/card';
 
-const CACHE_KEY = "mtg-proxy-card-cache";
+const CACHE_KEY = 'mtg-proxy-card-cache';
 const TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-interface CacheEntry {
-  card: Omit<CardInfo, "quantity">;
+type CacheEntry = {
+  card: Omit<CardInfo, 'quantity'>;
   cachedAt: number;
 }
 
@@ -28,7 +28,7 @@ function saveCache(store: CacheStore): void {
   }
 }
 
-export function getCachedCard(name: string): Omit<CardInfo, "quantity"> | null {
+export function getCachedCard(name: string): Omit<CardInfo, 'quantity'> | null {
   const store = loadCache();
   const key = name.toLowerCase();
   const entry = store[key];

@@ -1,10 +1,10 @@
-import type { CardInfo } from "../types/card";
+import type { CardInfo } from '../types/card';
 
-interface PrintViewProps {
+type Props = {
   cards: CardInfo[];
-}
+};
 
-export default function PrintView({ cards }: PrintViewProps) {
+export default function PrintView({ cards }: Props) {
   if (cards.length === 0) return null;
 
   // Expand cards by quantity for printing
@@ -13,13 +13,13 @@ export default function PrintView({ cards }: PrintViewProps) {
   );
 
   return (
-    <div className="print-view">
+    <div className='print-view'>
       {expandedCards.map((card) => (
-        <div key={card.key} className="print-card">
+        <div key={card.key} className='print-card'>
           {card.imageUrl ? (
             <img src={card.imageUrl} alt={card.name} />
           ) : (
-            <div className="print-card-placeholder">{card.name}</div>
+            <div className='print-card-placeholder'>{card.name}</div>
           )}
         </div>
       ))}

@@ -1,4 +1,4 @@
-export interface CardInfo {
+export type CardInfo = {
   name: string;
   quantity: number;
   imageUrl: string | null;

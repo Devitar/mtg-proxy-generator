@@ -1,10 +1,10 @@
-import type { CardInfo } from "../types/card";
+import type { CardInfo } from '../types/';
 
-interface CardGridProps {
+type Props = {
   cards: CardInfo[];
-}
+};
 
-export default function CardGrid({ cards }: CardGridProps) {
+export default function CardGrid({ cards }: Props) {
   if (cards.length === 0) return null;
 
   // Expand cards by quantity for display
@@ -13,13 +13,13 @@ export default function CardGrid({ cards }: CardGridProps) {
   );
 
   return (
-    <div className="card-grid">
+    <div className='card-grid'>
       {expandedCards.map((card) => (
-        <div key={card.key} className="card-item">
+        <div key={card.key} className='card-item'>
           {card.imageUrl ? (
-            <img src={card.imageUrl} alt={card.name} loading="lazy" />
+            <img src={card.imageUrl} alt={card.name} loading='lazy' />
           ) : (
-            <div className="card-placeholder">{card.name}</div>
+            <div className='card-placeholder'>{card.name}</div>
           )}
         </div>
       ))}

@@ -1,21 +1,21 @@
-import { useState } from "react";
-import DecklistInput from "./components/DecklistInput";
-import CardGrid from "./components/CardGrid";
-import PrintView from "./components/PrintView";
-import type { CardInfo } from "./types/card";
-import { getCachedCard, cacheCards } from "./cardCache";
-import "./App.css";
+import { useState } from 'react';
+import DecklistInput from './components/DecklistInput';
+import CardGrid from './components/CardGrid';
+import PrintView from './components/PrintView';
+import type { CardInfo } from './types/card';
+import { getCachedCard, cacheCards } from './cardCache';
+import './App.css';
 
-interface DecklistEntry {
+type DecklistEntry = {
   quantity: number;
   name: string;
 }
 
 function parseDecklist(text: string): DecklistEntry[] {
   const entries: DecklistEntry[] = [];
-  for (const line of text.split("\n")) {
+  for (const line of text.split('\n')) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith("#")) continue;
+    if (!trimmed || trimmed.startsWith('//') || trimmed.startsWith('#')) continue;
     const match = trimmed.match(/^\s*(\d+)\s*[xX]?\s+(.+?)\s*$/);
     if (match) {
       entries.push({ quantity: parseInt(match[1], 10), name: match[2] });
@@ -36,13 +36,13 @@ export default function App() {
     try {
       const entries = parseDecklist(decklist);
       if (entries.length === 0) {
-        setError("No valid card entries found in decklist.");
+        setError('No valid card entries found in decklist.');
         return;
       }
 
       // Deduplicate and check cache
       const uniqueNames = [...new Set(entries.map((e) => e.name.toLowerCase()))];
-      const cached = new Map<string, Omit<CardInfo, "quantity">>();
+      const cached = new Map<string, Omit<CardInfo, 'quantity'>>();
       const uncachedNames: string[] = [];
 
       for (const name of uniqueNames) {
@@ -56,11 +56,11 @@ export default function App() {
 
       // Only call backend for uncached cards
       if (uncachedNames.length > 0) {
-        const response = await fetch("/api/cards/parse", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch('/api/cards/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            text: uncachedNames.map((n) => `1 ${n}`).join("\n"),
+            text: uncachedNames.map((n) => `1 ${n}`).join('\n'),
           }),
         });
 
@@ -88,7 +88,7 @@ export default function App() {
 
       setCards(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -97,18 +97,18 @@ export default function App() {
   const handlePrint = () => window.print();
 
   return (
-    <div className="app">
+    <div className='app'>
       <header>
         <h1>MTG Proxy Generator</h1>
       </header>
 
-      <main className="no-print">
+      <main className='no-print'>
         <DecklistInput onSubmit={handleSubmit} isLoading={isLoading} />
 
-        {error && <div className="error">{error}</div>}
+        {error && <div className='error'>{error}</div>}
 
         {cards.length > 0 && (
-          <button className="print-button" onClick={handlePrint}>
+          <button className='print-button' onClick={handlePrint}>
             Print Proxies
           </button>
         )}
