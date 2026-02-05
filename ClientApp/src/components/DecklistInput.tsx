@@ -1,0 +1,37 @@
+import { useState } from "react";
+
+interface DecklistInputProps {
+  onSubmit: (decklist: string) => void;
+  isLoading: boolean;
+}
+
+const PLACEHOLDER = `4 Lightning Bolt
+4 Counterspell
+2 Black Lotus
+1 Ancestral Recall`;
+
+export default function DecklistInput({ onSubmit, isLoading }: DecklistInputProps) {
+  const [text, setText] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (text.trim()) {
+      onSubmit(text);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="decklist-input">
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder={PLACEHOLDER}
+        rows={12}
+        disabled={isLoading}
+      />
+      <button type="submit" disabled={isLoading || !text.trim()}>
+        {isLoading ? "Loading..." : "Generate Proxies"}
+      </button>
+    </form>
+  );
+}

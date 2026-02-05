@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MtgProxyGenerator.Api/MtgProxyGenerator.Api.csproj" />
+  </Folder>
+</Solution>
