@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { DecklistInput, CardGrid, PrintView } from '~/components';
 import type { CardInfo } from '~/types/card';
 import { getCachedCard, cacheCards } from '~/cardCache';
@@ -7,7 +7,7 @@ import '~/App.css';
 type DecklistEntry = {
   quantity: number;
   name: string;
-}
+};
 
 function parseDecklist(text: string): DecklistEntry[] {
   const entries: DecklistEntry[] = [];
@@ -26,8 +26,13 @@ export default function App() {
   const [cards, setCards] = useState<CardInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleSubmit = async (decklist: string) => {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     setError(null);
 
@@ -60,6 +65,7 @@ export default function App() {
           body: JSON.stringify({
             text: uncachedNames.map((n) => `1 ${n}`).join('\n'),
           }),
+          signal: controller.signal,
         });
 
         if (!response.ok) {
@@ -86,6 +92,7 @@ export default function App() {
 
       setCards(result);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
