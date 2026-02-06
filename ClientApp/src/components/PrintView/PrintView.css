@@ -1,0 +1,35 @@
+.print-view {
+  display: none;
+}
+
+@media print {
+  .print-view {
+    display: grid;
+    grid-template-columns: repeat(3, 2.5in);
+    grid-auto-rows: 3.5in;
+    gap: 0;
+  }
+
+  .print-card {
+    width: 2.5in;
+    height: 3.5in;
+    overflow: hidden;
+  }
+
+  .print-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+  }
+
+  .print-card-placeholder {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12pt;
+  }
+}

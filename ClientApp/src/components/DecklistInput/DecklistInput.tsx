@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './DecklistInput.css';
 
 type Props = {
   onSubmit: (decklist: string) => void;

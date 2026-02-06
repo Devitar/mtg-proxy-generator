@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import DecklistInput from './components/DecklistInput';
-import CardGrid from './components/CardGrid';
-import PrintView from './components/PrintView';
-import type { CardInfo } from './types/card';
-import { getCachedCard, cacheCards } from './cardCache';
-import './App.css';
+import { DecklistInput, CardGrid, PrintView } from '~/components';
+import type { CardInfo } from '~/types/card';
+import { getCachedCard, cacheCards } from '~/cardCache';
+import '~/App.css';
 
 type DecklistEntry = {
   quantity: number;

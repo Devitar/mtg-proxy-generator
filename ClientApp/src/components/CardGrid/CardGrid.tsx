@@ -1,4 +1,5 @@
-import type { CardInfo } from '../types/';
+import type { CardInfo } from '~/types/';
+import './CardGrid.css';
 
 type Props = {
   cards: CardInfo[];

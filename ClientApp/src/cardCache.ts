@@ -1,4 +1,4 @@
-import type { CardInfo } from './types/card';
+import type { CardInfo } from '~/types/card';
 
 const CACHE_KEY = 'mtg-proxy-card-cache';
 const TTL_MS = 24 * 60 * 60 * 1000; // 24 hours

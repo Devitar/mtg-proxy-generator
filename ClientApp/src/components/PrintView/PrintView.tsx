@@ -1,4 +1,5 @@
-import type { CardInfo } from '../types/card';
+import type { CardInfo } from '~/types/card';
+import './PrintView.css';
 
 type Props = {
   cards: CardInfo[];
