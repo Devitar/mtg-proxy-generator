@@ -13,7 +13,7 @@ public partial class DecklistParser : IDecklistParser
     {
         var entries = new List<DecklistEntry>();
 
-        foreach (var line in decklist.Split('\n'))
+        foreach (var line in decklist.Split(["\n", "\r\n", "\r"], StringSplitOptions.None))
         {
             var trimmed = line.Trim();
 
