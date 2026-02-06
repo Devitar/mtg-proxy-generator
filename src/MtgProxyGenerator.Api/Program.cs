@@ -34,6 +34,13 @@ if (app.Environment.IsDevelopment())
     app.UseCors("DevCors");
 }
 
+app.UseExceptionHandler(error => error.Run(async context =>
+{
+    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+    context.Response.ContentType = "text/plain";
+    await context.Response.WriteAsync("An unexpected error occurred.");
+}));
+
 // Serve React static files in production
 app.UseDefaultFiles();
 app.UseStaticFiles();
