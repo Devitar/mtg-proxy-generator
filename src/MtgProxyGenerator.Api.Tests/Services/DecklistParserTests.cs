@@ -190,4 +190,31 @@ public class DecklistParserTests
         result[0].Name.Should().Be("Bolt");
         result[1].Name.Should().Be("Path");
     }
+
+    [Fact]
+    public void Parse_OversizedQuantity_CappedAtMaxQuantity()
+    {
+        var result = _parser.Parse("999999 Mountain");
+
+        result.Should().ContainSingle()
+            .Which.Quantity.Should().Be(DecklistParser.MaxQuantity);
+    }
+
+    [Fact]
+    public void Parse_QuantityAtMax_NotCapped()
+    {
+        var result = _parser.Parse($"{DecklistParser.MaxQuantity} Mountain");
+
+        result.Should().ContainSingle()
+            .Which.Quantity.Should().Be(DecklistParser.MaxQuantity);
+    }
+
+    [Fact]
+    public void Parse_QuantityBelowMax_NotCapped()
+    {
+        var result = _parser.Parse("50 Mountain");
+
+        result.Should().ContainSingle()
+            .Which.Quantity.Should().Be(50);
+    }
 }

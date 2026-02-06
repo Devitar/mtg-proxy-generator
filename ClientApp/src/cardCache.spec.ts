@@ -1,4 +1,4 @@
-import { getCachedCard, cacheCards } from '~/cardCache';
+import { getCachedCard, getCachedCards, cacheCards } from '~/cardCache';
 import { createCardInfo } from '~/test/helpers';
 
 describe('cardCache', () => {
@@ -92,5 +92,57 @@ describe('cardCache', () => {
     });
 
     expect(() => cacheCards([createCardInfo({ name: 'Bolt' })])).not.toThrow();
+  });
+
+  describe('getCachedCards (bulk)', () => {
+    it('returns a map of cached cards', () => {
+      cacheCards([createCardInfo({ name: 'Bolt' }), createCardInfo({ name: 'Path' })]);
+
+      const result = getCachedCards(['bolt', 'path']);
+
+      expect(result.size).toBe(2);
+      expect(result.get('bolt')!.name).toBe('Bolt');
+      expect(result.get('path')!.name).toBe('Path');
+    });
+
+    it('omits uncached names from the result', () => {
+      cacheCards([createCardInfo({ name: 'Bolt' })]);
+
+      const result = getCachedCards(['bolt', 'missing']);
+
+      expect(result.size).toBe(1);
+      expect(result.has('missing')).toBe(false);
+    });
+
+    it('omits expired entries and cleans them from store', () => {
+      const now = Date.now();
+      vi.spyOn(Date, 'now').mockReturnValue(now);
+
+      cacheCards([createCardInfo({ name: 'Bolt' }), createCardInfo({ name: 'Path' })]);
+
+      vi.spyOn(Date, 'now').mockReturnValue(now + 24 * 60 * 60 * 1000 + 1);
+
+      const result = getCachedCards(['bolt', 'path']);
+      expect(result.size).toBe(0);
+
+      // Verify expired entries were removed from storage
+      vi.spyOn(Date, 'now').mockReturnValue(now);
+      expect(getCachedCard('bolt')).toBeNull();
+    });
+
+    it('parses localStorage only once for multiple lookups', () => {
+      cacheCards([createCardInfo({ name: 'Bolt' }), createCardInfo({ name: 'Path' })]);
+
+      const spy = vi.spyOn(Storage.prototype, 'getItem');
+      getCachedCards(['bolt', 'path', 'swords']);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns empty map for empty input', () => {
+      const result = getCachedCards([]);
+
+      expect(result.size).toBe(0);
+    });
   });
 });

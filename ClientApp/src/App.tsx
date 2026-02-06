@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { DecklistInput, CardGrid, PrintView } from '~/components';
 import type { CardInfo } from '~/types/card';
-import { getCachedCard, cacheCards } from '~/cardCache';
+import { getCachedCards, cacheCards } from '~/cardCache';
 import '~/App.css';
 
 type DecklistEntry = {
@@ -49,19 +49,10 @@ export default function App() {
         return;
       }
 
-      // Deduplicate and check cache
+      // Deduplicate and check cache (single parse via bulk lookup)
       const uniqueNames = [...new Set(entries.map((e) => e.name.toLowerCase()))];
-      const cached = new Map<string, Omit<CardInfo, 'quantity'>>();
-      const uncachedNames: string[] = [];
-
-      for (const name of uniqueNames) {
-        const hit = getCachedCard(name);
-        if (hit) {
-          cached.set(name, hit);
-        } else {
-          uncachedNames.push(name);
-        }
-      }
+      const cached = getCachedCards(uniqueNames);
+      const uncachedNames = uniqueNames.filter((name) => !cached.has(name));
 
       // Only call backend for uncached cards
       if (uncachedNames.length > 0) {

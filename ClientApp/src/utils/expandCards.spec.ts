@@ -1,4 +1,4 @@
-import { expandCards } from '~/utils/expandCards';
+import { expandCards, MAX_QUANTITY } from '~/utils/expandCards';
 import { createCardInfo } from '~/test/helpers';
 
 describe('expandCards', () => {
@@ -68,5 +68,26 @@ describe('expandCards', () => {
     const keys = result.map((c) => c.key);
 
     expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it('caps quantity at MAX_QUANTITY', () => {
+    const cards = [createCardInfo({ name: 'Mountain', quantity: 999999 })];
+    const result = expandCards(cards);
+
+    expect(result).toHaveLength(MAX_QUANTITY);
+  });
+
+  it('does not cap quantity at or below MAX_QUANTITY', () => {
+    const cards = [createCardInfo({ name: 'Mountain', quantity: MAX_QUANTITY })];
+    const result = expandCards(cards);
+
+    expect(result).toHaveLength(MAX_QUANTITY);
+  });
+
+  it('treats negative quantity as 0', () => {
+    const cards = [createCardInfo({ name: 'Bolt', quantity: -5 })];
+    const result = expandCards(cards);
+
+    expect(result).toHaveLength(0);
   });
 });
