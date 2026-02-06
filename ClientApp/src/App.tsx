@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DecklistInput, CardGrid, PrintView } from '~/components';
 import type { CardInfo } from '~/types/card';
 import { getCachedCard, cacheCards } from '~/cardCache';
@@ -27,6 +27,12 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   const handleSubmit = async (decklist: string) => {
     abortControllerRef.current?.abort();
