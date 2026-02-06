@@ -66,12 +66,22 @@ public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> log
         {
             logger.LogError(ex, "Error fetching card collection from Scryfall");
         }
+        catch (JsonException ex)
+        {
+            logger.LogError(ex, "Error parsing Scryfall response");
+        }
 
         return results;
     }
 
     private static CardInfo? ParseCard(JsonElement card)
     {
+        if (!card.TryGetProperty("name", out var nameProp))
+            return null;
+
+        var name = nameProp.GetString();
+        if (name is null) return null;
+
         string? imageUrl = null;
         if (card.TryGetProperty("image_uris", out var imageUris)
             && imageUris.TryGetProperty("large", out var largeUri))
@@ -79,16 +89,16 @@ public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> log
             imageUrl = largeUri.GetString();
         }
 
-        var name = card.GetProperty("name").GetString();
-        if (name is null) return null;
+        card.TryGetProperty("scryfall_uri", out var scryfallUriProp);
+        card.TryGetProperty("set", out var setProp);
 
         return new CardInfo
         {
             Name = name,
             Quantity = 1,
             ImageUrl = imageUrl,
-            ScryfallUrl = card.GetProperty("scryfall_uri").GetString(),
-            SetCode = card.GetProperty("set").GetString()
+            ScryfallUrl = scryfallUriProp.ValueKind != JsonValueKind.Undefined ? scryfallUriProp.GetString() : null,
+            SetCode = setProp.ValueKind != JsonValueKind.Undefined ? setProp.GetString() : null
         };
     }
 }
