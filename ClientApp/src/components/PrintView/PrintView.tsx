@@ -1,4 +1,6 @@
 import type { CardInfo } from '~/types/card';
+import { expandCards } from '~/utils/expandCards';
+import { CardImage } from '~/components';
 import './PrintView.css';
 
 type Props = {
@@ -8,20 +10,11 @@ type Props = {
 export default function PrintView({ cards }: Props) {
   if (cards.length === 0) return null;
 
-  // Expand cards by quantity for printing
-  const expandedCards = cards.flatMap((card) =>
-    Array.from({ length: card.quantity }, (_, i) => ({ ...card, key: `${card.name}-${i}` }))
-  );
-
   return (
     <div className='print-view'>
-      {expandedCards.map((card) => (
+      {expandCards(cards).map((card) => (
         <div key={card.key} className='print-card'>
-          {card.imageUrl ? (
-            <img src={card.imageUrl} alt={card.name} />
-          ) : (
-            <div className='print-card-placeholder'>{card.name}</div>
-          )}
+          <CardImage name={card.name} imageUrl={card.imageUrl} placeholderClassName='print-card-placeholder' />
         </div>
       ))}
     </div>

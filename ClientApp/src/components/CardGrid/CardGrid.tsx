@@ -1,4 +1,6 @@
 import type { CardInfo } from '~/types/';
+import { expandCards } from '~/utils/expandCards';
+import { CardImage } from '~/components';
 import './CardGrid.css';
 
 type Props = {
@@ -8,20 +10,11 @@ type Props = {
 export default function CardGrid({ cards }: Props) {
   if (cards.length === 0) return null;
 
-  // Expand cards by quantity for display
-  const expandedCards = cards.flatMap((card) =>
-    Array.from({ length: card.quantity }, (_, i) => ({ ...card, key: `${card.name}-${i}` }))
-  );
-
   return (
     <div className='card-grid'>
-      {expandedCards.map((card) => (
+      {expandCards(cards).map((card) => (
         <div key={card.key} className='card-item'>
-          {card.imageUrl ? (
-            <img src={card.imageUrl} alt={card.name} loading='lazy' />
-          ) : (
-            <div className='card-placeholder'>{card.name}</div>
-          )}
+          <CardImage name={card.name} imageUrl={card.imageUrl} placeholderClassName='card-placeholder' lazy />
         </div>
       ))}
     </div>
