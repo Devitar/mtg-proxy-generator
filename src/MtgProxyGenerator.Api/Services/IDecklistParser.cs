@@ -4,5 +4,5 @@ namespace MtgProxyGenerator.Api.Services;
 
 public interface IDecklistParser
 {
-    List<DecklistEntry> Parse(string decklist);
+    IReadOnlyList<DecklistEntry> Parse(string decklist);
 }

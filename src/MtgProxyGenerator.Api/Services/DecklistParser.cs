@@ -9,7 +9,7 @@ public partial class DecklistParser : IDecklistParser
     [GeneratedRegex(@"^\s*(\d+)\s*[xX]?\s+(.+?)\s*$")]
     private static partial Regex EntryPattern();
 
-    public List<DecklistEntry> Parse(string decklist)
+    public IReadOnlyList<DecklistEntry> Parse(string decklist)
     {
         var entries = new List<DecklistEntry>();
 

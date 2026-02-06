@@ -4,5 +4,5 @@ namespace MtgProxyGenerator.Api.Services;
 
 public interface IScryfallService
 {
-    Task<Dictionary<string, CardInfo>> GetCardsAsync(IEnumerable<string> cardNames);
+    Task<IReadOnlyDictionary<string, CardInfo>> GetCardsAsync(IEnumerable<string> cardNames);
 }

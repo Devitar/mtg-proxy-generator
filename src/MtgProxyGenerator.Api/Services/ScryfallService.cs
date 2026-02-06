@@ -5,7 +5,7 @@ namespace MtgProxyGenerator.Api.Services;
 
 public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> logger) : IScryfallService
 {
-    public async Task<Dictionary<string, CardInfo>> GetCardsAsync(IEnumerable<string> cardNames)
+    public async Task<IReadOnlyDictionary<string, CardInfo>> GetCardsAsync(IEnumerable<string> cardNames)
     {
         var results = new Dictionary<string, CardInfo>(StringComparer.OrdinalIgnoreCase);
 
@@ -95,7 +95,6 @@ public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> log
         return new CardInfo
         {
             Name = name,
-            Quantity = 1,
             ImageUrl = imageUrl,
             ScryfallUrl = scryfallUriProp.ValueKind != JsonValueKind.Undefined ? scryfallUriProp.GetString() : null,
             SetCode = setProp.ValueKind != JsonValueKind.Undefined ? setProp.GetString() : null
