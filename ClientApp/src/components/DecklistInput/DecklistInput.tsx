@@ -27,6 +27,7 @@ export default function DecklistInput({ onSubmit, isLoading }: Props) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={PLACEHOLDER}
+        aria-label='Decklist'
         rows={12}
         maxLength={10000}
         disabled={isLoading}

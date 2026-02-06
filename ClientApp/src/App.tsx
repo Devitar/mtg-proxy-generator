@@ -110,7 +110,7 @@ export default function App() {
       <main className='no-print'>
         <DecklistInput onSubmit={handleSubmit} isLoading={isLoading} />
 
-        {error && <div className='error'>{error}</div>}
+        {error && <div className='error' role='alert'>{error}</div>}
 
         {cards.length > 0 && (
           <button className='print-button' onClick={handlePrint}>
