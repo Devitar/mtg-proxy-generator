@@ -30,7 +30,7 @@ public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> log
         try
         {
             var content = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync("https://api.scryfall.com/cards/collection", content);
+            var response = await httpClient.PostAsync("cards/collection", content);
 
             if (!response.IsSuccessStatusCode)
             {

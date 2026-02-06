@@ -8,9 +8,11 @@ builder.Services.AddSingleton<IDecklistParser, DecklistParser>();
 
 builder.Services.AddHttpClient<IScryfallService, ScryfallService>(client =>
 {
+    client.BaseAddress = new Uri(builder.Configuration["Scryfall:BaseUrl"]!);
     client.DefaultRequestHeaders.UserAgent.ParseAdd("MtgProxyGenerator/1.0");
     client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-});
+})
+.AddStandardResilienceHandler();
 
 if (builder.Environment.IsDevelopment())
 {
