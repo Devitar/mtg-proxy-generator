@@ -36,9 +36,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler(error => error.Run(async context =>
 {
+    var logger = context.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("UnhandledException");
+    var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+    logger.LogError(exception, "Unhandled exception for {Method} {Path}", context.Request.Method, context.Request.Path);
+
     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-    context.Response.ContentType = "text/plain";
-    await context.Response.WriteAsync("An unexpected error occurred.");
+    context.Response.ContentType = "application/json";
+    await context.Response.WriteAsJsonAsync(new { error = "An unexpected error occurred." });
 }));
 
 // Serve React static files in production

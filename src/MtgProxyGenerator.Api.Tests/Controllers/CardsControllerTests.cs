@@ -27,7 +27,7 @@ public class CardsControllerTests
         var result = await _controller.ParseDecklist(request);
 
         result.Result.Should().BeOfType<BadRequestObjectResult>()
-            .Which.Value.Should().Be("Decklist text is required.");
+            .Which.Value.Should().BeEquivalentTo(new { error = "Decklist text is required." });
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class CardsControllerTests
         var result = await _controller.ParseDecklist(request);
 
         result.Result.Should().BeOfType<BadRequestObjectResult>()
-            .Which.Value.Should().Be("No valid card entries found in decklist.");
+            .Which.Value.Should().BeEquivalentTo(new { error = "No valid card entries found in decklist." });
     }
 
     [Fact]

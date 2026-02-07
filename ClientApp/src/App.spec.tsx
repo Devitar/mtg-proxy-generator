@@ -84,7 +84,7 @@ describe('App', () => {
       vi.fn().mockResolvedValue({
         ok: false,
         status: 400,
-        text: () => Promise.resolve('Bad request error'),
+        json: () => Promise.resolve({ error: 'Bad request error' }),
       }),
     );
 

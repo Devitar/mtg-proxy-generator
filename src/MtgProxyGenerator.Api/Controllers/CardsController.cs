@@ -12,12 +12,12 @@ public class CardsController(IDecklistParser parser, IScryfallService scryfallSe
     public async Task<ActionResult<List<CardInfo>>> ParseDecklist([FromBody] DecklistRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Text))
-            return BadRequest("Decklist text is required.");
+            return BadRequest(new { error = "Decklist text is required." });
 
         var entries = parser.Parse(request.Text);
 
         if (entries.Count == 0)
-            return BadRequest("No valid card entries found in decklist.");
+            return BadRequest(new { error = "No valid card entries found in decklist." });
 
         var uniqueNames = entries.Select(e => e.Name).Distinct(StringComparer.OrdinalIgnoreCase);
         var cardLookup = await scryfallService.GetCardsAsync(uniqueNames);

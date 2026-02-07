@@ -66,8 +66,14 @@ export default function App() {
         });
 
         if (!response.ok) {
-          const text = await response.text();
-          throw new Error(text || `Request failed (${response.status})`);
+          let message = `Request failed (${response.status})`;
+          try {
+            const body = await response.json();
+            if (body.error) message = body.error;
+          } catch {
+            // non-JSON response — use default message
+          }
+          throw new Error(message);
         }
 
         const fetched: CardInfo[] = await response.json();

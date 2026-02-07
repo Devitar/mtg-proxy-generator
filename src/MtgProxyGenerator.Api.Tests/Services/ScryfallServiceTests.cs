@@ -260,6 +260,6 @@ public class ScryfallServiceTests
 
         await service.GetCardsAsync(["Nonexistent Card"]);
 
-        _logger.ReceivedWithAnyArgs().LogWarning(default!, default(object?[]));
+        _logger.ReceivedWithAnyArgs().LogWarning(default!, default(object?[])!);
     }
 }
