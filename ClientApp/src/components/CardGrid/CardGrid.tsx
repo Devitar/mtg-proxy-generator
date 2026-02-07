@@ -11,12 +11,12 @@ export default function CardGrid({ cards }: Props) {
   if (cards.length === 0) return null;
 
   return (
-    <div className='card-grid'>
+    <ul className='card-grid'>
       {expandCards(cards).map((card) => (
-        <div key={card.key} className='card-item'>
+        <li key={card.key} className='card-item'>
           <CardImage name={card.name} imageUrl={card.imageUrl} placeholderClassName='card-placeholder' lazy />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

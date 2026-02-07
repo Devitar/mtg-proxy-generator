@@ -4,9 +4,9 @@ import { createCardInfo } from '~/test/helpers';
 
 describe('CardGrid', () => {
   it('renders nothing when cards array is empty', () => {
-    const { container } = render(<CardGrid cards={[]} />);
+    render(<CardGrid cards={[]} />);
 
-    expect(container.querySelector('.card-grid')).not.toBeInTheDocument();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
   it('renders card images for each expanded card', () => {

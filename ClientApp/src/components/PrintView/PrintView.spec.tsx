@@ -4,9 +4,9 @@ import { createCardInfo } from '~/test/helpers';
 
 describe('PrintView', () => {
   it('renders nothing when cards array is empty', () => {
-    const { container } = render(<PrintView cards={[]} />);
+    render(<PrintView cards={[]} />);
 
-    expect(container.querySelector('.print-view')).not.toBeInTheDocument();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
   it('renders expanded cards', () => {
@@ -25,9 +25,9 @@ describe('PrintView', () => {
 
   it('has print-view class on container', () => {
     const cards = [createCardInfo({ name: 'Bolt', quantity: 1, imageUrl: 'bolt.jpg' })];
-    const { container } = render(<PrintView cards={cards} />);
+    render(<PrintView cards={cards} />);
 
-    expect(container.querySelector('.print-view')).toBeInTheDocument();
+    expect(screen.getByRole('list')).toHaveClass('print-view');
   });
 
   it('renders placeholder for card without imageUrl', () => {

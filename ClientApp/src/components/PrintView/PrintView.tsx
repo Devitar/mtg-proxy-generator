@@ -11,12 +11,12 @@ export default function PrintView({ cards }: Props) {
   if (cards.length === 0) return null;
 
   return (
-    <div className='print-view'>
+    <ul className='print-view'>
       {expandCards(cards).map((card) => (
-        <div key={card.key} className='print-card'>
+        <li key={card.key} className='print-card'>
           <CardImage name={card.name} imageUrl={card.imageUrl} placeholderClassName='print-card-placeholder' />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
