@@ -21,8 +21,8 @@ if (builder.Environment.IsDevelopment())
         options.AddPolicy("DevCors", policy =>
         {
             policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .WithHeaders("Content-Type")
+                  .WithMethods("POST");
         });
     });
 }

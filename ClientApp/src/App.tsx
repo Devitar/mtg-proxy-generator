@@ -64,7 +64,7 @@ export default function App() {
           body: JSON.stringify({
             text: uncachedNames.map((n) => `1 ${n}`).join('\n'),
           }),
-          signal: controller.signal,
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(30_000)]),
         });
 
         if (!response.ok) {
@@ -103,6 +103,10 @@ export default function App() {
       setCards(result);
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
+      if (err instanceof DOMException && err.name === 'TimeoutError') {
+        setError('Request timed out. Please try again.');
+        return;
+      }
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
