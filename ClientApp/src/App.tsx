@@ -26,6 +26,7 @@ export default function App() {
   const [cards, setCards] = useState<CardInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function App() {
 
     setIsLoading(true);
     setError(null);
+    setWarning(null);
 
     try {
       const entries = parseDecklist(decklist);
@@ -93,6 +95,11 @@ export default function App() {
         }
       }
 
+      const notFound = uniqueNames.filter((name) => !cached.has(name));
+      if (notFound.length > 0) {
+        setWarning(`Cards not found: ${notFound.join(', ')}`);
+      }
+
       setCards(result);
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -114,6 +121,8 @@ export default function App() {
         <DecklistInput onSubmit={handleSubmit} isLoading={isLoading} />
 
         {error && <div className='error' role='alert'>{error}</div>}
+
+        {warning && <div className='warning' role='status'>{warning}</div>}
 
         {cards.length > 0 && (
           <button className='print-button' onClick={handlePrint}>

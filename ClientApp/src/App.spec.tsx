@@ -177,6 +177,48 @@ describe('App', () => {
     });
   });
 
+  it('shows warning for cards not found by backend', async () => {
+    // Backend only returns "lightning bolt", not "ligthning bolt" (misspelled)
+    vi.stubGlobal('fetch', mockFetchSuccess([{ name: 'lightning bolt' }]));
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(
+      screen.getByLabelText('Decklist'),
+      '4 Lightning Bolt\n2 card that does not exist',
+    );
+    await user.click(screen.getByRole('button', { name: /generate proxies/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'Cards not found: card that does not exist',
+      );
+    });
+  });
+
+  it('does not show warning when all cards are found', async () => {
+    vi.stubGlobal(
+      'fetch',
+      mockFetchSuccess([{ name: 'lightning bolt' }, { name: 'path to exile' }]),
+    );
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(
+      screen.getByLabelText('Decklist'),
+      '4 Lightning Bolt\n2 Path to Exile',
+    );
+    await user.click(screen.getByRole('button', { name: /generate proxies/i }));
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
+    });
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
   it('shows loading state during fetch', async () => {
     let resolveResponse!: (value: unknown) => void;
     vi.stubGlobal(
