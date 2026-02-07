@@ -2,25 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { DecklistInput, CardGrid, PrintView } from '~/components';
 import type { CardInfo } from '~/types/card';
 import { getCachedCards, cacheCards } from '~/cardCache';
+import { parseDecklist } from '~/utils/parseDecklist';
 import '~/App.css';
-
-type DecklistEntry = {
-  quantity: number;
-  name: string;
-};
-
-function parseDecklist(text: string): DecklistEntry[] {
-  const entries: DecklistEntry[] = [];
-  for (const line of text.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('//') || trimmed.startsWith('#')) continue;
-    const match = trimmed.match(/^\s*(\d+)\s*[xX]?\s+(.+?)\s*$/);
-    if (match) {
-      entries.push({ quantity: parseInt(match[1], 10), name: match[2] });
-    }
-  }
-  return entries;
-}
 
 export default function App() {
   const [cards, setCards] = useState<CardInfo[]>([]);
