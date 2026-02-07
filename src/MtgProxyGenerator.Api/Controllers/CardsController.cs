@@ -8,6 +8,8 @@ namespace MtgProxyGenerator.Api.Controllers;
 [Route("api/[controller]")]
 public class CardsController(IDecklistParser parser, IScryfallService scryfallService) : ControllerBase
 {
+    public const int MaxUniqueCards = 250;
+
     [HttpPost("parse")]
     public async Task<ActionResult<List<CardInfo>>> ParseDecklist([FromBody] DecklistRequest request)
     {
@@ -19,7 +21,10 @@ public class CardsController(IDecklistParser parser, IScryfallService scryfallSe
         if (entries.Count == 0)
             return BadRequest(new { error = "No valid card entries found in decklist." });
 
-        var uniqueNames = entries.Select(e => e.Name).Distinct(StringComparer.OrdinalIgnoreCase);
+        var uniqueNames = entries.Select(e => e.Name).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+        if (uniqueNames.Count > MaxUniqueCards)
+            return BadRequest(new { error = $"Too many unique cards. Maximum is {MaxUniqueCards}." });
         var cardLookup = await scryfallService.GetCardsAsync(uniqueNames);
 
         var cards = new List<CardInfo>();

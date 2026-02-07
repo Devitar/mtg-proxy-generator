@@ -173,6 +173,41 @@ public class CardsControllerTests
     }
 
     [Fact]
+    public async Task ParseDecklist_TooManyUniqueCards_ReturnsBadRequest()
+    {
+        var request = new DecklistRequest { Text = "many cards" };
+        var entries = Enumerable.Range(0, CardsController.MaxUniqueCards + 1)
+            .Select(i => new DecklistEntry { Quantity = 1, Name = $"Card{i}" })
+            .ToList();
+        _parser.Parse(request.Text).Returns(entries);
+
+        var result = await _controller.ParseDecklist(request);
+
+        result.Result.Should().BeOfType<BadRequestObjectResult>()
+            .Which.Value.Should().BeEquivalentTo(new { error = $"Too many unique cards. Maximum is {CardsController.MaxUniqueCards}." });
+    }
+
+    [Fact]
+    public async Task ParseDecklist_ExactlyMaxUniqueCards_Succeeds()
+    {
+        var request = new DecklistRequest { Text = "max cards" };
+        var entries = Enumerable.Range(0, CardsController.MaxUniqueCards)
+            .Select(i => new DecklistEntry { Quantity = 1, Name = $"Card{i}" })
+            .ToList();
+        _parser.Parse(request.Text).Returns(entries);
+
+        var lookup = entries.ToDictionary(
+            e => e.Name,
+            e => new CardInfo { Name = e.Name },
+            StringComparer.OrdinalIgnoreCase);
+        _scryfallService.GetCardsAsync(Arg.Any<IEnumerable<string>>()).Returns(lookup);
+
+        var result = await _controller.ParseDecklist(request);
+
+        result.Result.Should().BeOfType<OkObjectResult>();
+    }
+
+    [Fact]
     public async Task ParseDecklist_DuplicateNames_PassesDistinctNamesToService()
     {
         var request = new DecklistRequest { Text = "4 Bolt\n2 Bolt\n1 Path" };
