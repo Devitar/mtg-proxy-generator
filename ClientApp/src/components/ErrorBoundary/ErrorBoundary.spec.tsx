@@ -55,4 +55,30 @@ describe('ErrorBoundary', () => {
 
     expect(console.error).toHaveBeenCalled();
   });
+
+  it('calls onError callback when child throws', () => {
+    const onError = vi.fn();
+    render(
+      <ErrorBoundary onError={onError}>
+        <ThrowingComponent />
+      </ErrorBoundary>,
+    );
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Test error' }),
+      expect.objectContaining({ componentStack: expect.any(String) }),
+    );
+  });
+
+  it('works without onError callback', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowingComponent />
+      </ErrorBoundary>,
+    );
+
+    expect(
+      screen.getByText('Something went wrong. Please refresh the page and try again.'),
+    ).toBeInTheDocument();
+  });
 });
