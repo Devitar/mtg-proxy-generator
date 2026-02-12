@@ -1,3 +1,4 @@
+using MtgProxyGenerator.Api.Models;
 using MtgProxyGenerator.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,10 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IDecklistParser, DecklistParser>();
+builder.Services.AddHealthChecks();
+
+var scryfallBaseUrl = builder.Configuration["Scryfall:BaseUrl"]
+    ?? throw new InvalidOperationException("Missing required configuration: Scryfall:BaseUrl");
 
 builder.Services.AddHttpClient<IScryfallService, ScryfallService>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Scryfall:BaseUrl"]!);
+    client.BaseAddress = new Uri(scryfallBaseUrl);
     client.DefaultRequestHeaders.UserAgent.ParseAdd("MtgProxyGenerator/1.0");
     client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 })
@@ -42,7 +47,7 @@ app.UseExceptionHandler(error => error.Run(async context =>
 
     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
     context.Response.ContentType = "application/json";
-    await context.Response.WriteAsJsonAsync(new { error = "An unexpected error occurred." });
+    await context.Response.WriteAsJsonAsync(ApiResponse<object>.Fail("An unexpected error occurred."));
 }));
 
 // Serve React static files in production
@@ -50,6 +55,7 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 // Fallback: serve index.html for client-side routes
 app.MapFallbackToFile("index.html");
