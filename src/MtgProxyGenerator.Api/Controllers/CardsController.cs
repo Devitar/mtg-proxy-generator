@@ -11,20 +11,21 @@ public class CardsController(IDecklistParser parser, IScryfallService scryfallSe
     public const int MaxUniqueCards = 250;
 
     [HttpPost("parse")]
-    public async Task<ActionResult<List<CardInfo>>> ParseDecklist([FromBody] DecklistRequest request)
+    public async Task<ActionResult<ApiResponse<List<CardInfo>>>> ParseDecklist([FromBody] DecklistRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Text))
-            return BadRequest(new { error = "Decklist text is required." });
+            return BadRequest(ApiResponse<List<CardInfo>>.Fail("Decklist text is required."));
 
         var entries = parser.Parse(request.Text);
 
         if (entries.Count == 0)
-            return BadRequest(new { error = "No valid card entries found in decklist." });
+            return BadRequest(ApiResponse<List<CardInfo>>.Fail("No valid card entries found in decklist."));
 
         var uniqueNames = entries.Select(e => e.Name).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
         if (uniqueNames.Count > MaxUniqueCards)
-            return BadRequest(new { error = $"Too many unique cards. Maximum is {MaxUniqueCards}." });
+            return BadRequest(ApiResponse<List<CardInfo>>.Fail($"Too many unique cards. Maximum is {MaxUniqueCards}."));
+
         var cardLookup = await scryfallService.GetCardsAsync(uniqueNames);
 
         var cards = new List<CardInfo>();
@@ -43,6 +44,6 @@ public class CardsController(IDecklistParser parser, IScryfallService scryfallSe
             }
         }
 
-        return Ok(cards);
+        return Ok(ApiResponse<List<CardInfo>>.Success(cards));
     }
 }
