@@ -1,4 +1,4 @@
-import { expandCards, MAX_QUANTITY } from '~/utils/expandCards';
+import { expandCards, MAX_QUANTITY, MAX_TOTAL_CARDS } from '~/utils/expandCards';
 import { createCardInfo } from '~/test/helpers';
 
 describe('expandCards', () => {
@@ -89,5 +89,14 @@ describe('expandCards', () => {
     const result = expandCards(cards);
 
     expect(result).toHaveLength(0);
+  });
+
+  it('caps total expanded cards at MAX_TOTAL_CARDS', () => {
+    const cards = Array.from({ length: 20 }, (_, i) =>
+      createCardInfo({ name: `Card${i}`, quantity: MAX_QUANTITY }),
+    );
+    const result = expandCards(cards);
+
+    expect(result).toHaveLength(MAX_TOTAL_CARDS);
   });
 });
