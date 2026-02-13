@@ -10,27 +10,30 @@ type CacheEntry = {
 
 type CacheStore = Record<string, CacheEntry>;
 
+let memo: CacheStore | null = null;
+
 function loadCache(): CacheStore {
+  if (memo) return memo;
   try {
     const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as CacheStore;
+    if (!raw) {
+      memo = {};
+    } else {
+      memo = JSON.parse(raw) as CacheStore;
+    }
   } catch {
-    return {};
+    memo = {};
   }
+  return memo;
 }
 
 function saveCache(store: CacheStore): void {
+  memo = store;
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(store));
   } catch {
     // localStorage full or unavailable — silently ignore
   }
-}
-
-export function getCachedCard(name: string): Omit<CardInfo, 'quantity'> | null {
-  const store = loadCache();
-  return getFromStore(store, name);
 }
 
 export function getCachedCards(
@@ -57,18 +60,6 @@ export function getCachedCards(
   return result;
 }
 
-function getFromStore(store: CacheStore, name: string): Omit<CardInfo, 'quantity'> | null {
-  const key = name.toLowerCase();
-  const entry = store[key];
-  if (!entry) return null;
-  if (Date.now() - entry.cachedAt > TTL_MS) {
-    delete store[key];
-    saveCache(store);
-    return null;
-  }
-  return entry.card;
-}
-
 export function cacheCards(cards: CardInfo[]): void {
   const store = loadCache();
   const now = Date.now();
@@ -77,4 +68,8 @@ export function cacheCards(cards: CardInfo[]): void {
     store[card.name.toLowerCase()] = { card: cardData, cachedAt: now };
   }
   saveCache(store);
+}
+
+export function clearMemo(): void {
+  memo = null;
 }

@@ -1,13 +1,19 @@
-import { getCachedCard, getCachedCards, cacheCards } from '~/cardCache';
+import { getCachedCards, cacheCards, clearMemo } from '~/cardCache';
 import { createCardInfo } from '~/test/helpers';
+
+function getCachedCard(name: string) {
+  const result = getCachedCards([name]);
+  return result.get(name.toLowerCase()) ?? null;
+}
 
 describe('cardCache', () => {
   beforeEach(() => {
     localStorage.clear();
+    clearMemo();
     vi.restoreAllMocks();
   });
 
-  it('getCachedCard returns null for uncached card', () => {
+  it('returns null for uncached card', () => {
     expect(getCachedCard('Lightning Bolt')).toBeNull();
   });
 
@@ -21,42 +27,45 @@ describe('cardCache', () => {
     expect(cached!.imageUrl).toBe(card.imageUrl);
   });
 
-  it('getCachedCard omits quantity from cached result', () => {
+  it('cached result omits quantity', () => {
     cacheCards([createCardInfo({ name: 'Bolt', quantity: 4 })]);
 
     const cached = getCachedCard('Bolt');
     expect(cached).not.toHaveProperty('quantity');
   });
 
-  it('getCachedCard is case insensitive', () => {
+  it('lookup is case insensitive', () => {
     cacheCards([createCardInfo({ name: 'Lightning Bolt' })]);
 
     expect(getCachedCard('lightning bolt')).not.toBeNull();
     expect(getCachedCard('LIGHTNING BOLT')).not.toBeNull();
   });
 
-  it('getCachedCard returns null for expired entry', () => {
+  it('returns null for expired entry', () => {
     const now = Date.now();
     vi.spyOn(Date, 'now').mockReturnValue(now);
 
     cacheCards([createCardInfo({ name: 'Bolt' })]);
 
     // Advance time past 24-hour TTL
+    clearMemo();
     vi.spyOn(Date, 'now').mockReturnValue(now + 24 * 60 * 60 * 1000 + 1);
 
     expect(getCachedCard('Bolt')).toBeNull();
   });
 
-  it('getCachedCard removes expired entry from store', () => {
+  it('removes expired entry from store', () => {
     const now = Date.now();
     vi.spyOn(Date, 'now').mockReturnValue(now);
 
     cacheCards([createCardInfo({ name: 'Bolt' })]);
 
+    clearMemo();
     vi.spyOn(Date, 'now').mockReturnValue(now + 24 * 60 * 60 * 1000 + 1);
     getCachedCard('Bolt');
 
     // Reset time and check entry was removed
+    clearMemo();
     vi.spyOn(Date, 'now').mockReturnValue(now);
     expect(getCachedCard('Bolt')).toBeNull();
   });
@@ -80,7 +89,7 @@ describe('cardCache', () => {
     expect(getCachedCard('Bolt')!.imageUrl).toBe('new.jpg');
   });
 
-  it('getCachedCard returns null when localStorage has invalid JSON', () => {
+  it('returns null when localStorage has invalid JSON', () => {
     localStorage.setItem('mtg-proxy-card-cache', 'not valid json');
 
     expect(getCachedCard('Bolt')).toBeNull();
@@ -120,23 +129,36 @@ describe('cardCache', () => {
 
       cacheCards([createCardInfo({ name: 'Bolt' }), createCardInfo({ name: 'Path' })]);
 
+      clearMemo();
       vi.spyOn(Date, 'now').mockReturnValue(now + 24 * 60 * 60 * 1000 + 1);
 
       const result = getCachedCards(['bolt', 'path']);
       expect(result.size).toBe(0);
 
       // Verify expired entries were removed from storage
+      clearMemo();
       vi.spyOn(Date, 'now').mockReturnValue(now);
       expect(getCachedCard('bolt')).toBeNull();
     });
 
     it('parses localStorage only once for multiple lookups', () => {
       cacheCards([createCardInfo({ name: 'Bolt' }), createCardInfo({ name: 'Path' })]);
+      clearMemo();
 
       const spy = vi.spyOn(Storage.prototype, 'getItem');
       getCachedCards(['bolt', 'path', 'swords']);
 
       expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses memoized cache on second call without hitting localStorage', () => {
+      cacheCards([createCardInfo({ name: 'Bolt' })]);
+
+      const spy = vi.spyOn(Storage.prototype, 'getItem');
+      getCachedCards(['bolt']);
+      getCachedCards(['bolt']);
+
+      expect(spy).not.toHaveBeenCalled();
     });
 
     it('returns empty map for empty input', () => {
