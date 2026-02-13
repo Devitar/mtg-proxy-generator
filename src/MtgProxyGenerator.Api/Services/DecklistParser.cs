@@ -6,6 +6,7 @@ namespace MtgProxyGenerator.Api.Services;
 public partial class DecklistParser : IDecklistParser
 {
     public const int MaxQuantity = 100;
+    public const int MaxNameLength = 200;
 
     // Matches lines like "4 Lightning Bolt", "4x Lightning Bolt", "1X Black Lotus"
     [GeneratedRegex(@"^\s*(\d+)\s*[xX]?\s+(.+?)\s*$")]
@@ -26,10 +27,13 @@ public partial class DecklistParser : IDecklistParser
             var match = EntryPattern().Match(trimmed);
             if (match.Success)
             {
+                var name = match.Groups[2].Value;
+                if (name.Length > MaxNameLength) continue;
+
                 entries.Add(new DecklistEntry
                 {
                     Quantity = Math.Min(int.Parse(match.Groups[1].Value), MaxQuantity),
-                    Name = match.Groups[2].Value
+                    Name = name
                 });
             }
         }

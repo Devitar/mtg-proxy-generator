@@ -217,4 +217,23 @@ public class DecklistParserTests
         result.Should().ContainSingle()
             .Which.Quantity.Should().Be(50);
     }
+
+    [Fact]
+    public void Parse_NameExceedingMaxLength_Skipped()
+    {
+        var longName = new string('A', DecklistParser.MaxNameLength + 1);
+        var result = _parser.Parse($"1 {longName}");
+
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Parse_NameAtMaxLength_Accepted()
+    {
+        var name = new string('A', DecklistParser.MaxNameLength);
+        var result = _parser.Parse($"1 {name}");
+
+        result.Should().ContainSingle()
+            .Which.Name.Should().Be(name);
+    }
 }
