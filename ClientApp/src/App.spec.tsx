@@ -1,27 +1,28 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '~/App';
+import { clearMemo } from '~/cardCache';
 
 function mockFetchSuccess(cards: Array<{ name: string; imageUrl?: string }>) {
   return vi.fn().mockResolvedValue({
     ok: true,
     json: () =>
-      Promise.resolve(
-        cards.map((c) => ({
+      Promise.resolve({
+        data: cards.map((c) => ({
           name: c.name,
           quantity: 1,
           imageUrl: c.imageUrl ?? `https://img/${c.name}.jpg`,
           scryfallUrl: `https://scryfall.com/${c.name}`,
           setCode: 'test',
         })),
-      ),
-    text: () => Promise.resolve(''),
+      }),
   });
 }
 
 describe('App', () => {
   beforeEach(() => {
     localStorage.clear();
+    clearMemo();
     vi.restoreAllMocks();
   });
 
@@ -241,16 +242,17 @@ describe('App', () => {
     resolveResponse({
       ok: true,
       json: () =>
-        Promise.resolve([
-          {
-            name: 'lightning bolt',
-            quantity: 1,
-            imageUrl: 'img.jpg',
-            scryfallUrl: 'url',
-            setCode: 'test',
-          },
-        ]),
-      text: () => Promise.resolve(''),
+        Promise.resolve({
+          data: [
+            {
+              name: 'lightning bolt',
+              quantity: 1,
+              imageUrl: 'img.jpg',
+              scryfallUrl: 'url',
+              setCode: 'test',
+            },
+          ],
+        }),
     });
 
     await waitFor(() => {

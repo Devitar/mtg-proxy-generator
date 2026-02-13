@@ -50,18 +50,13 @@ export default function App() {
           signal: AbortSignal.any([controller.signal, AbortSignal.timeout(30_000)]),
         });
 
+        const body = await response.json();
+
         if (!response.ok) {
-          let message = `Request failed (${response.status})`;
-          try {
-            const body = await response.json();
-            if (body.error) message = body.error;
-          } catch {
-            // non-JSON response — use default message
-          }
-          throw new Error(message);
+          throw new Error(body.error ?? `Request failed (${response.status})`);
         }
 
-        const fetched: CardInfo[] = await response.json();
+        const fetched: CardInfo[] = body.data;
         cacheCards(fetched);
         for (const card of fetched) {
           const { quantity: _, ...cardData } = card;
