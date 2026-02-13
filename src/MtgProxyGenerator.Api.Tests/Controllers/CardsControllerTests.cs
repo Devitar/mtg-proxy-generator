@@ -26,8 +26,10 @@ public class CardsControllerTests
 
         var result = await _controller.ParseDecklist(request);
 
-        result.Result.Should().BeOfType<BadRequestObjectResult>()
-            .Which.Value.Should().BeEquivalentTo(new { error = "Decklist text is required." });
+        var response = result.Result.Should().BeOfType<BadRequestObjectResult>().Subject
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject;
+        response.Error.Should().Be("Decklist text is required.");
+        response.Data.Should().BeNull();
     }
 
     [Fact]
@@ -38,8 +40,9 @@ public class CardsControllerTests
 
         var result = await _controller.ParseDecklist(request);
 
-        result.Result.Should().BeOfType<BadRequestObjectResult>()
-            .Which.Value.Should().BeEquivalentTo(new { error = "No valid card entries found in decklist." });
+        var response = result.Result.Should().BeOfType<BadRequestObjectResult>().Subject
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject;
+        response.Error.Should().Be("No valid card entries found in decklist.");
     }
 
     [Fact]
@@ -62,8 +65,10 @@ public class CardsControllerTests
 
         var result = await _controller.ParseDecklist(request);
 
-        var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-        var cards = okResult.Value.Should().BeOfType<List<CardInfo>>().Subject;
+        var response = result.Result.Should().BeOfType<OkObjectResult>().Subject
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject;
+        response.Error.Should().BeNull();
+        var cards = response.Data!;
         cards.Should().HaveCount(2);
         cards[0].Name.Should().Be("Bolt");
         cards[0].Quantity.Should().Be(4);
@@ -91,7 +96,7 @@ public class CardsControllerTests
         var result = await _controller.ParseDecklist(request);
 
         var cards = result.Result.Should().BeOfType<OkObjectResult>().Subject
-            .Value.Should().BeOfType<List<CardInfo>>().Subject;
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject.Data!;
         cards.Should().ContainSingle().Which.Name.Should().Be("Bolt");
     }
 
@@ -111,7 +116,7 @@ public class CardsControllerTests
         var result = await _controller.ParseDecklist(request);
 
         var cards = result.Result.Should().BeOfType<OkObjectResult>().Subject
-            .Value.Should().BeOfType<List<CardInfo>>().Subject;
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject.Data!;
         cards[0].Quantity.Should().Be(4);
     }
 
@@ -137,7 +142,7 @@ public class CardsControllerTests
         var result = await _controller.ParseDecklist(request);
 
         var cards = result.Result.Should().BeOfType<OkObjectResult>().Subject
-            .Value.Should().BeOfType<List<CardInfo>>().Subject;
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject.Data!;
         var card = cards[0];
         card.Name.Should().Be("Lightning Bolt");
         card.ImageUrl.Should().Be("https://img.jpg");
@@ -168,7 +173,7 @@ public class CardsControllerTests
         var result = await _controller.ParseDecklist(request);
 
         var cards = result.Result.Should().BeOfType<OkObjectResult>().Subject
-            .Value.Should().BeOfType<List<CardInfo>>().Subject;
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject.Data!;
         cards.Select(c => c.Name).Should().ContainInOrder("C", "A", "B");
     }
 
@@ -183,8 +188,9 @@ public class CardsControllerTests
 
         var result = await _controller.ParseDecklist(request);
 
-        result.Result.Should().BeOfType<BadRequestObjectResult>()
-            .Which.Value.Should().BeEquivalentTo(new { error = $"Too many unique cards. Maximum is {CardsController.MaxUniqueCards}." });
+        var response = result.Result.Should().BeOfType<BadRequestObjectResult>().Subject
+            .Value.Should().BeOfType<ApiResponse<List<CardInfo>>>().Subject;
+        response.Error.Should().Be($"Too many unique cards. Maximum is {CardsController.MaxUniqueCards}.");
     }
 
     [Fact]
