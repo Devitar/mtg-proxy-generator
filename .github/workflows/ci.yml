@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Restore
+        run: dotnet restore src/MtgProxyGenerator.Api.Tests
+
+      - name: Test
+        run: dotnet test src/MtgProxyGenerator.Api.Tests --no-restore
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: ClientApp/package-lock.json
+
+      - name: Install
+        run: npm ci
+        working-directory: ClientApp
+
+      - name: Test
+        run: npm run test:run
+        working-directory: ClientApp

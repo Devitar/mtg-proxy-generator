@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <!-- Build and test React app during publish -->
-  <Target Name="PublishSpa" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="PublishSpa" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release' AND '$(SkipSpa)' != 'true'">
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run test:run" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />

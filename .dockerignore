@@ -1,0 +1,24 @@
+# .NET build output
+**/bin/
+**/obj/
+publish/
+
+# Node modules and frontend build output
+ClientApp/node_modules/
+ClientApp/dist/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# IDE
+.vs/
+**/.idea/
+**/*.user
+
+# GitHub Actions
+.github/
