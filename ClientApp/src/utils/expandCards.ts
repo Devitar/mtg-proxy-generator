@@ -12,6 +12,10 @@ export function expandCards(cards: CardInfo[]): ExpandedCard[] {
     for (let i = 0; i < qty; i++) {
       if (result.length >= MAX_TOTAL_CARDS) return result;
       result.push({ ...card, key: `${card.name}-${i}` });
+      if (card.backFaceImageUrl) {
+        if (result.length >= MAX_TOTAL_CARDS) return result;
+        result.push({ ...card, imageUrl: card.backFaceImageUrl, key: `${card.name}-back-${i}` });
+      }
     }
   }
   return result;

@@ -18,3 +18,7 @@ Backend<br />
 Frontend, (If your terminal is not running in /ClientApp directory add `cd ClientApp && ` before command)<br />
 `npm run dev`<br />
 Then open http://localhost:5173 in your browser.
+
+## Testing the Docker image
+`docker build -t mtg-proxy-generator .`
+`docker run -p 10000:10000 mtg-proxy-generator`

@@ -103,6 +103,55 @@ describe('cardCache', () => {
     expect(() => cacheCards([createCardInfo({ name: 'Bolt' })])).not.toThrow();
   });
 
+  describe('dual-faced cards', () => {
+    it('caches MDFC under full name and both face names', () => {
+      const card = createCardInfo({
+        name: 'Bridgeworks Battle // Tanglespan Bridgeworks',
+        imageUrl: 'https://img.scryfall.com/front.jpg',
+        backFaceImageUrl: 'https://img.scryfall.com/back.jpg',
+      });
+      cacheCards([card]);
+
+      expect(getCachedCard('Bridgeworks Battle // Tanglespan Bridgeworks')).not.toBeNull();
+      expect(getCachedCard('Bridgeworks Battle')).not.toBeNull();
+      expect(getCachedCard('Tanglespan Bridgeworks')).not.toBeNull();
+    });
+
+    it('retrieves MDFC by front face name with backFaceImageUrl intact', () => {
+      const card = createCardInfo({
+        name: 'Bridgeworks Battle // Tanglespan Bridgeworks',
+        imageUrl: 'https://img.scryfall.com/front.jpg',
+        backFaceImageUrl: 'https://img.scryfall.com/back.jpg',
+      });
+      cacheCards([card]);
+
+      const cached = getCachedCard('Bridgeworks Battle');
+      expect(cached!.backFaceImageUrl).toBe('https://img.scryfall.com/back.jpg');
+    });
+
+    it('retrieves MDFC by back face name with same card data', () => {
+      const card = createCardInfo({
+        name: 'Bridgeworks Battle // Tanglespan Bridgeworks',
+        imageUrl: 'https://img.scryfall.com/front.jpg',
+        backFaceImageUrl: 'https://img.scryfall.com/back.jpg',
+      });
+      cacheCards([card]);
+
+      const cached = getCachedCard('Tanglespan Bridgeworks');
+      expect(cached!.name).toBe('Bridgeworks Battle // Tanglespan Bridgeworks');
+      expect(cached!.imageUrl).toBe('https://img.scryfall.com/front.jpg');
+      expect(cached!.backFaceImageUrl).toBe('https://img.scryfall.com/back.jpg');
+    });
+
+    it('does not create extra face name entries for normal cards', () => {
+      cacheCards([createCardInfo({ name: 'Lightning Bolt' })]);
+
+      const store = JSON.parse(localStorage.getItem('mtg-proxy-card-cache')!);
+      expect(Object.keys(store)).toHaveLength(1);
+      expect(Object.keys(store)[0]).toBe('lightning bolt');
+    });
+  });
+
   describe('getCachedCards (bulk)', () => {
     it('returns a map of cached cards', () => {
       cacheCards([createCardInfo({ name: 'Bolt' }), createCardInfo({ name: 'Path' })]);

@@ -38,6 +38,7 @@ public class CardsController(IDecklistParser parser, IScryfallService scryfallSe
                     Name = card.Name,
                     Quantity = entry.Quantity,
                     ImageUrl = card.ImageUrl,
+                    BackFaceImageUrl = card.BackFaceImageUrl,
                     ScryfallUrl = card.ScryfallUrl,
                     SetCode = card.SetCode
                 });

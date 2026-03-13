@@ -60,7 +60,12 @@ export default function App() {
         cacheCards(fetched);
         for (const card of fetched) {
           const { quantity: _, ...cardData } = card;
-          cached.set(card.name.toLowerCase(), cardData);
+          const names = card.name.includes(' // ')
+            ? [card.name, ...card.name.split(' // ').map((n) => n.trim())]
+            : [card.name];
+          for (const name of names) {
+            cached.set(name.toLowerCase(), cardData);
+          }
         }
       }
 

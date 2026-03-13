@@ -5,6 +5,7 @@ export function createCardInfo(overrides: Partial<CardInfo> = {}): CardInfo {
     name: 'Lightning Bolt',
     quantity: 4,
     imageUrl: 'https://cards.scryfall.io/large/bolt.jpg',
+    backFaceImageUrl: null,
     scryfallUrl: 'https://scryfall.com/card/bolt',
     setCode: 'lea',
     ...overrides,

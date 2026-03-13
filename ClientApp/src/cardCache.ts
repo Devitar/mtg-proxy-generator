@@ -65,7 +65,12 @@ export function cacheCards(cards: CardInfo[]): void {
   const now = Date.now();
   for (const card of cards) {
     const { quantity: _, ...cardData } = card;
-    store[card.name.toLowerCase()] = { card: cardData, cachedAt: now };
+    const names = card.name.includes(' // ')
+      ? [card.name, ...card.name.split(' // ').map((n) => n.trim())]
+      : [card.name];
+    for (const name of names) {
+      store[name.toLowerCase()] = { card: cardData, cachedAt: now };
+    }
   }
   saveCache(store);
 }

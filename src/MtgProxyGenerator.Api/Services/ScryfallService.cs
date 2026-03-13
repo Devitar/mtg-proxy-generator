@@ -48,8 +48,17 @@ public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> log
                 foreach (var card in data.EnumerateArray())
                 {
                     var cardInfo = ParseCard(card);
-                    if (cardInfo is not null)
-                        results[cardInfo.Name] = cardInfo;
+                    if (cardInfo is null) continue;
+
+                    results[cardInfo.Name] = cardInfo;
+
+                    // Also index by each face name so MDFC lookups like
+                    // "Bridgeworks Battle" resolve to "Bridgeworks Battle // Tanglespan Bridgeworks"
+                    if (cardInfo.Name.Contains(" // "))
+                    {
+                        foreach (var faceName in cardInfo.Name.Split(" // "))
+                            results[faceName.Trim()] = cardInfo;
+                    }
                 }
             }
 
@@ -83,10 +92,29 @@ public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> log
         if (name is null) return null;
 
         string? imageUrl = null;
+        string? backFaceImageUrl = null;
+
         if (card.TryGetProperty("image_uris", out var imageUris)
             && imageUris.TryGetProperty("large", out var largeUri))
         {
             imageUrl = largeUri.GetString();
+        }
+        // MDFC cards have no top-level image_uris; extract both face images
+        else if (card.TryGetProperty("card_faces", out var faces))
+        {
+            var faceList = faces.EnumerateArray().ToArray();
+            if (faceList.Length > 0
+                && faceList[0].TryGetProperty("image_uris", out var frontUris)
+                && frontUris.TryGetProperty("large", out var frontLarge))
+            {
+                imageUrl = frontLarge.GetString();
+            }
+            if (faceList.Length > 1
+                && faceList[1].TryGetProperty("image_uris", out var backUris)
+                && backUris.TryGetProperty("large", out var backLarge))
+            {
+                backFaceImageUrl = backLarge.GetString();
+            }
         }
 
         card.TryGetProperty("scryfall_uri", out var scryfallUriProp);
@@ -96,6 +124,7 @@ public class ScryfallService(HttpClient httpClient, ILogger<ScryfallService> log
         {
             Name = name,
             ImageUrl = imageUrl,
+            BackFaceImageUrl = backFaceImageUrl,
             ScryfallUrl = scryfallUriProp.ValueKind != JsonValueKind.Undefined ? scryfallUriProp.GetString() : null,
             SetCode = setProp.ValueKind != JsonValueKind.Undefined ? setProp.GetString() : null
         };

@@ -91,6 +91,22 @@ describe('expandCards', () => {
     expect(result).toHaveLength(0);
   });
 
+  it('emits front and back face entries for MDFC cards', () => {
+    const card = createCardInfo({
+      name: 'Bridgeworks Battle // Tanglespan Bridgeworks',
+      quantity: 2,
+      imageUrl: 'https://cards.scryfall.io/large/front.jpg',
+      backFaceImageUrl: 'https://cards.scryfall.io/large/back.jpg',
+    });
+    const result = expandCards([card]);
+
+    expect(result).toHaveLength(4);
+    expect(result[0]).toMatchObject({ imageUrl: 'https://cards.scryfall.io/large/front.jpg', key: 'Bridgeworks Battle // Tanglespan Bridgeworks-0' });
+    expect(result[1]).toMatchObject({ imageUrl: 'https://cards.scryfall.io/large/back.jpg', key: 'Bridgeworks Battle // Tanglespan Bridgeworks-back-0' });
+    expect(result[2]).toMatchObject({ imageUrl: 'https://cards.scryfall.io/large/front.jpg', key: 'Bridgeworks Battle // Tanglespan Bridgeworks-1' });
+    expect(result[3]).toMatchObject({ imageUrl: 'https://cards.scryfall.io/large/back.jpg', key: 'Bridgeworks Battle // Tanglespan Bridgeworks-back-1' });
+  });
+
   it('caps total expanded cards at MAX_TOTAL_CARDS', () => {
     const cards = Array.from({ length: 20 }, (_, i) =>
       createCardInfo({ name: `Card${i}`, quantity: MAX_QUANTITY }),
